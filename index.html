@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Journey Stopwatch</title>
+    <style>
+        /* General styling */
+        :root {
+            --smaller: .75;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden; /* Prevent scrolling */
+        }
+
+        body {
+            align-items: center;
+            background-color: #fdac98; /* Original background */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            font-family: -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Oxygen-Sans,
+                Ubuntu,
+                Cantarell,
+                "Helvetica Neue",
+                sans-serif;
+        }
+
+        .container {
+            color: #5b12ba;
+            margin: 0 auto;
+            text-align: center;
+            position: relative; /* For positioning the spans */
+            z-index: 1; /* Ensure content is above spans */
+            font-weight: bolder;
+            font-family: cursive;
+        }
+
+        li {
+            display: inline-block;
+            font-size: 1.5em;
+            list-style-type: none;
+            padding: 1em;
+            text-transform: uppercase;
+        }
+
+        li span,
+        p {
+            display: block;
+            font-size: 4.5rem;
+            z-index: 2; /* Ensure stopwatch display is above spans */
+            position: relative;
+        }
+
+        .emoji {
+            font-size: 2rem; /* Adjusted for responsiveness */
+            margin-top: 20px;
+            z-index: 2; /* Ensure emoji is above spans */
+            position: relative;
+        }
+
+        .sad-message {
+            font-size: 1.2rem;
+            margin-top: 10px;
+            color: #555;
+            z-index: 2; /* Ensure sad message is above spans */
+            position: relative;
+        }
+
+        .current-date,
+        .start-time {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            z-index: 2; /* Ensure date is above spans */
+            position: relative;
+        }
+
+        @media all and (max-width: 768px) {
+            li {
+                font-size: calc(1.125rem * var(--smaller));
+            }
+
+            li span {
+                font-size: calc(3.375rem * var(--smaller));
+            }
+
+            .emoji {
+                font-size: 1.5rem; /* Smaller emoji size on smaller screens */
+            }
+        }
+
+        span {
+            background: url("https://hips.hearstapps.com/goodhousekeeping-uk/main/embedded/29905/boy-crying.jpg?resize=1120:*");
+            /* background: url("https://png.pngtree.com/png-vector/20240722/ourmid/pngtree-3d-small-baby-with-weeping-expressions-on-transparent-background-png-image_13185444.png"); */
+            width: 150px;
+            height: 150px;
+            position: absolute;
+            pointer-events: none;
+            background-size: cover;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            animation: animate 20s linear; /* Slowed down animation */
+            z-index: 0; /* Ensure spans are below the stopwatch */
+        }
+
+        @keyframes animate {
+            0% {
+                transform: translate(-50%, -50%);
+                opacity: 1;
+                filter: hue-rotate(0);
+            }
+
+            100% {
+                transform: translate(-50%, -5000%);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="start-time" id="startTime"></div>
+        <div id="stopwatch">
+            <ul id="time">
+                <li><b id="days">0</b> days</li>
+                <li><b id="hours">0</b> Hours</li>
+                <li><b id="minutes">0</b> Minutes</li>
+                <li><b id="seconds">0</b> Seconds</li>
+            </ul>
+        </div>
+
+        <b style="color: rgb(222, 57, 131);">This is the time that has passed up to this point since you left Bengaluru.</b>
+        <div class="emoji">🥺☹️☹️☹️☹️🥺</div> <!-- Sad face emojis -->
+        <div class="sad-message">Click anywhere</div>
+    </div>
+
+    <script>
+        const second = 1000,
+            minute = second * 60,
+            hour = minute * 60,
+            day = hour * 24;
+
+        // Set the starting date and time to the specified time
+        const startTime = new Date("2024-10-15T18:00:00").getTime();
+
+        // Display the start time with month name in 12-hour format
+        const startDate = new Date(startTime);
+        const options = {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true // Set to true for 12-hour format
+        };
+        document.getElementById("startTime").innerText = startDate.toLocaleString('en-US', options);
+
+        const countUp = setInterval(function () {
+            const now = new Date().getTime();
+            const distance = now - startTime;
+
+            // Calculate elapsed time in days, hours, minutes, seconds
+            const days = Math.floor(distance / day);
+            const hours = Math.floor((distance % day) / hour);
+            const minutes = Math.floor((distance % hour) / minute);
+            const seconds = Math.floor((distance % minute) / second);
+
+            // Display the time
+            document.getElementById("days").innerText = days;
+            document.getElementById("hours").innerText = hours;
+            document.getElementById("minutes").innerText = minutes;
+            document.getElementById("seconds").innerText = seconds;
+        }, 1000);
+
+        // Mouse move effect
+        const bodyEl = document.querySelector("body");
+
+        bodyEl.addEventListener("mousemove", (event) => {
+            const xPos = event.offsetX;
+            const yPos = event.offsetY;
+            const spanEl = document.createElement("span");
+            spanEl.style.left = xPos + "px";
+            spanEl.style.top = yPos + "px";
+            const size = Math.random() * 100;
+            spanEl.style.width = size + "px";
+            spanEl.style.height = size + "px";
+            bodyEl.appendChild(spanEl);
+            setTimeout(() => {
+                spanEl.remove();
+            }, 10000);
+        });
+    </script>
+</body>
+
+</html>
